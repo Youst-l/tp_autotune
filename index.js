@@ -13,6 +13,7 @@ program
   .option('--start-date <startDate>', 'YYYY-MM-DD')
   .option('--end-date <endDate>', 'YYYY-MM-DD')
   .option('--source <pathToJsonDump>', 'Path to the Tidepool JSON data.')
+  .option('-d, --no-docker', 'Set flag to use globally installed oref0 executables instead of docker image.', true)
   .parse(process.argv);
 
 const jsonPath = program.pathToJsonDump || '../tidepool/command-line-data-tools/test.json';
@@ -131,6 +132,13 @@ async function main() {
     path.join(DATA_PATH, `tp-treatments.json`),
     JSON.stringify(translatedEvents, null, ' ')
   );
+  let DOCKER_CMD = 'docker run -i -v "$(pwd)":/app pazaan/openaps ';
+  let DOCKER_PREFIX = '/app/';
+
+  if(!program.docker){
+    DOCKER_CMD = '';
+    DOCKER_PREFIX = '';
+  }
 
   // this loop is _very_ similar to what oref0-autotune does
   const currentDay = moment(START_DATE);
@@ -142,10 +150,10 @@ async function main() {
     // cp data/autotune/newprofile.2017-09-12.json data/autotune/profile.json
     // oref0-autotune-recommends-report data
     await fs.copy('data/autotune/profile.json', `data/autotune/profile.${currentDayStr}.json`);
-    await exec(`oref0-autotune-prep data/tp-treatments.json data/autotune/profile.json data/tp-entries-${currentDayStr}.json > data/autotune.${currentDayStr}.json`);
-    await exec(`oref0-autotune-core data/autotune.${currentDayStr}.json data/autotune/profile.json  data/autotune/profile.pump.json > data/newprofile.${currentDayStr}.json`);
+    await exec(`${DOCKER_CMD}oref0-autotune-prep ${DOCKER_PREFIX}data/tp-treatments.json ${DOCKER_PREFIX}data/autotune/profile.json ${DOCKER_PREFIX}data/tp-entries-${currentDayStr}.json > data/autotune.${currentDayStr}.json`);
+    await exec(`${DOCKER_CMD}oref0-autotune-core ${DOCKER_PREFIX}data/autotune.${currentDayStr}.json ${DOCKER_PREFIX}data/autotune/profile.json  ${DOCKER_PREFIX}data/autotune/profile.pump.json > data/newprofile.${currentDayStr}.json`);
     await fs.copy(`data/newprofile.${currentDayStr}.json`, 'data/autotune/profile.json');
-    await exec('oref0-autotune-recommends-report data');
+    await exec(`${DOCKER_CMD}oref0-autotune-recommends-report ${DOCKER_PREFIX}data`);
     currentDay.add(1,'day');
   }
 console.log(await fs.readFile('data/autotune/autotune_recommendations.log', 'utf8'));

@@ -1,0 +1,20 @@
+{
+  "min_5m_carbimpact": 3,
+  "dia": 3,
+  "basalprofile": null,
+  "isfProfile": {
+    "sensitivities": [
+      {
+          "i": 0,
+          "start": "00:00:00",
+          "sensitivity": null,
+          "offset": 0,
+          "x": 0,
+          "endOffset": 1440
+      }
+    ]
+  },
+  "carb_ratio": null,
+  "autosens_max": 1.2,
+  "autosens_min": 0.7
+}

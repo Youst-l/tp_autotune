@@ -1,0 +1,19 @@
+{
+  "name": "tp_autotune",
+  "version": "0.0.1",
+  "description": "Translate Tidepool data for use with Autotune",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "tune": "node -r babel-register index.js"
+  },
+  "dependencies": {
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0",
+    "commander": "^2.11.0",
+    "fs-extra": "^4.0.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "oref0": "^0.5.3"
+  }
+}

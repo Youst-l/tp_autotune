@@ -5,6 +5,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import util from 'util';
 import program from 'commander';
+import promisify from 'es6-promisify';
+const exec = promisify(require('child_process').exec);
 
 program
   .version('0.0.1')
@@ -36,7 +38,7 @@ async function main() {
   const sortedData = _.sortBy(data, ['time']);
 
   // profile.json generation
-
+  console.log('Generating profile.json');
   const pumpSettings = _.last(
     _.filter(sortedData, {type:'pumpSettings'})
   );
@@ -80,7 +82,7 @@ async function main() {
   await fs.copy(profile_path, path.join(AUTOTUNE_PATH, 'profile.json'));
 
   // CBG data translation
-
+  console.log('Translating CBG values');
   const cbgData = _.filter(sortedData, (datum) => {
     return datum.type === 'cbg' &&
       moment.utc(datum.time).isBetween(DATE_FILTER_START, DATE_FILTER_END);
@@ -101,7 +103,7 @@ async function main() {
   });
 
   // treatment history translation
-
+  console.log('Translating pump history events');
   const historyEvents = _.filter(sortedData, (data) => {
     return _.includes(['basal', 'bolus', 'wizard'], data.type) &&
       // non-temp basal's are taken care of by the basal profiles
@@ -130,13 +132,23 @@ async function main() {
     JSON.stringify(translatedEvents, null, ' ')
   );
 
+  // this loop is _very_ similar to what oref0-autotune does
   const currentDay = moment(START_DATE);
   while(currentDay.isSameOrBefore(END_DATE)){
     const currentDayStr = currentDay.format('YYYY-MM-DD');
-    console.log(currentDay.format('YYYY-MM-DD'));
-
+    console.log(`Processing ${currentDayStr}`);
+    // oref0-autotune-prep ./data/tp-treatments.json ./data/settings/profile.json ./data/tp-entries-2017-09-12.json > ./data/autotune.2017-09-12.json
+    // oref0-autotune-core data/autotune.2017-09-12.json data/settings/profile.json  data/autotune/profile.pump.json > data/newprofile.json
+    // cp data/autotune/newprofile.2017-09-12.json data/autotune/profile.json
+    // oref0-autotune-recommends-report data
+    await fs.copy('data/autotune/profile.json', `data/autotune/profile.${currentDayStr}.json`);
+    await exec(`oref0-autotune-prep data/tp-treatments.json data/autotune/profile.json data/tp-entries-${currentDayStr}.json > data/autotune.${currentDayStr}.json`);
+    await exec(`oref0-autotune-core data/autotune.${currentDayStr}.json data/autotune/profile.json  data/autotune/profile.pump.json > data/newprofile.${currentDayStr}.json`);
+    await fs.copy(`data/newprofile.${currentDayStr}.json`, 'data/autotune/profile.json');
+    await exec('oref0-autotune-recommends-report data');
     currentDay.add(1,'day');
   }
+console.log(await fs.readFile('data/autotune/autotune_recommendations.log', 'utf8'));
 };
 
 main();

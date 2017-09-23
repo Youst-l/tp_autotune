@@ -11,6 +11,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "commander": "^2.11.0",
+    "es6-promisify": "^5.0.0",
     "fs-extra": "^4.0.2",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",

@@ -16,5 +16,13 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "oref0": "^0.5.3"
+  },
+  "devDependencies": {
+    "eslint": "^4.7.2",
+    "eslint-config-airbnb-base": "^12.0.0",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "prettier": "^1.7.0"
   }
 }

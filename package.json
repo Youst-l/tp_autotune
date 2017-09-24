@@ -1,11 +1,13 @@
 {
   "name": "tp_autotune",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Translate Tidepool data for use with Autotune",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "tune": "node -r babel-register index.js"
+    "tune": "node -r babel-register index.js",
+    "lint": "eslint .",
+    "lintfix": "eslint --fix ."
   },
   "dependencies": {
     "babel-preset-env": "^1.6.0",

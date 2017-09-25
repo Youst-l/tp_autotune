@@ -10,7 +10,7 @@ import translateUtils from './util';
 const exec = promisify(require('child_process').exec);
 
 program
-  .version('0.0.1')
+  .version('0.2.0')
   .option('--start-date <startDate>', 'YYYY-MM-DD')
   .option('--end-date <endDate>', 'YYYY-MM-DD')
   .option('--source <pathToJsonDump>', 'Path to the Tidepool JSON data.')

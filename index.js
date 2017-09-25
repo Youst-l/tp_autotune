@@ -19,10 +19,11 @@ program
     'Set flag to use globally installed oref0 executables instead of docker image.',
     true,
   )
+  .option('-v, --verbose', 'Verbose console logging')
   .parse(process.argv);
 
 const jsonPath =
-  program.pathToJsonDump || '../tidepool/command-line-data-tools/test.json';
+  program.source || '../tidepool/command-line-data-tools/test.json';
 const data = fs.readJsonSync(jsonPath);
 const DATA_PATH = path.resolve('data');
 const SETTINGS_PATH = path.join(DATA_PATH, 'settings');
@@ -52,7 +53,9 @@ const DATE_FILTER_END = moment.utc(END_DATE).add(1, 'day');
   const sortedData = _.sortBy(data, ['time']);
 
   // profile.json generation
-  console.log('Generating profile.json');
+  if (program.verbose) {
+    console.log('Generating profile.json');
+  }
   const pumpSettings = _.last(_.filter(sortedData, { type: 'pumpSettings' }));
 
   const { activeSchedule } = pumpSettings;
@@ -97,7 +100,9 @@ const DATE_FILTER_END = moment.utc(END_DATE).add(1, 'day');
   await fs.copy(profilePath, path.join(AUTOTUNE_PATH, 'profile.json'));
 
   // CBG data translation
-  console.log('Translating CBG values');
+  if (program.verbose) {
+    console.log('Translating CBG values');
+  }
   const cbgData = _.filter(
     sortedData,
     datum =>
@@ -121,7 +126,9 @@ const DATE_FILTER_END = moment.utc(END_DATE).add(1, 'day');
   });
 
   // treatment history translation
-  console.log('Translating pump history events');
+  if (program.verbose) {
+    console.log('Translating pump history events');
+  }
   const historyEvents = _.filter(
     sortedData,
     datum =>
@@ -161,7 +168,9 @@ const DATE_FILTER_END = moment.utc(END_DATE).add(1, 'day');
   const currentDay = moment(START_DATE);
   while (currentDay.isSameOrBefore(END_DATE)) {
     const currentDayStr = currentDay.format('YYYY-MM-DD');
-    console.log(`Processing ${currentDayStr}`);
+    if (program.verbose) {
+      console.log(`Processing ${currentDayStr}`);
+    }
     /* eslint-disable no-await-in-loop */
     await fs.copy(
       'data/autotune/profile.json',

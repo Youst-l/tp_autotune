@@ -148,7 +148,7 @@ const DATE_FILTER_END = moment.utc(END_DATE).add(1, 'day');
         return translateUtils.translateWizard(event);
       default:
         console.error('Unhandled event: ', event);
-        throw new Error("Unknown event");
+        throw new Error('Unknown event');
     }
   });
 
